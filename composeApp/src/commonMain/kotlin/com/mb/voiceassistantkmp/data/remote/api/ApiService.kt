@@ -15,28 +15,28 @@ import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 
-class ApiService(
+open class ApiService(
     private val client: HttpClient
 ) {
     // https://raw.githubusercontent.com/Bagdasaryan/mock_server/main/list_of_all_patients.js
     // http://192.168.178.175:5000
     // http://172.20.10.2:5000
 
-    suspend fun getPatients(lastUpdateTime: Long): PatientsResponseDto {
+    open suspend fun getPatients(lastUpdateTime: Long): PatientsResponseDto {
         return client.post(urlString = "http://192.168.178.175:5000/patients") {
             contentType(ContentType.Application.Json)
             setBody(GetPatientsRequestDto(lastUpdateTime = lastUpdateTime.toString()))
         }.body()
     }
 
-    suspend fun analyzeText(text: String): VitalDto {
+    suspend open fun analyzeText(text: String): VitalDto {
         return client.post("http://192.168.178.175:5000/parse") {
             contentType(ContentType.Application.Json)
             setBody(ParseTextRequestDto(text = text))
         }.body()
     }
 
-    suspend fun sendNewVitalsToHost(patientId: String, vital: Vital): AddVitalToHostResponseDto {
+    suspend open fun sendNewVitalsToHost(patientId: String, vital: Vital): AddVitalToHostResponseDto {
         return client.post("http://192.168.178.175:5000/patients/vital") {
             contentType(ContentType.Application.Json)
             setBody(

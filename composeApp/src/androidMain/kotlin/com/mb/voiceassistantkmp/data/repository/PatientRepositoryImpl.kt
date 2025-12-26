@@ -71,7 +71,6 @@ class PatientRepositoryImpl(
                         serverTime
                     ).toEntity()
                 )
-                println("DEBUG: Local DB updated successfully")
             } else {
                 throw Exception("Server failed to process vitals")
             }

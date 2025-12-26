@@ -2,8 +2,8 @@ package com.mb.voiceassistantkmp.domain.usecase
 
 import com.mb.voiceassistantkmp.domain.repository.PatientRepository
 
-class SyncPatientsUseCase(
+open class SyncPatientsUseCase(
     private val patientRepository: PatientRepository
 ) {
-    suspend operator fun invoke() = patientRepository.syncPatients()
+    open suspend operator fun invoke() = patientRepository.syncPatients()
 }
