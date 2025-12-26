@@ -1,8 +1,9 @@
 package com.mb.voiceassistantkmp.presentation.screen_patientDetails
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
@@ -37,6 +38,9 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
@@ -46,7 +50,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.font.FontWeight
@@ -65,7 +68,6 @@ fun PatientDetailsScreen(
 ) {
     val state by viewModel.state.collectAsState()
 
-    val blurRadius by animateDpAsState(if (state.isDialogOpen) 10.dp else 0.dp)
     val overlayAlpha by animateFloatAsState(if (state.isDialogOpen) 0.6f else 0.0f)
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
 
@@ -75,8 +77,7 @@ fun PatientDetailsScreen(
         Scaffold(
             modifier = Modifier
                 .fillMaxSize()
-                .nestedScroll(scrollBehavior.nestedScrollConnection)
-                .blur(blurRadius),
+                .nestedScroll(scrollBehavior.nestedScrollConnection),
             topBar = {
                 LargeTopAppBar(
                     title = { Text("Patient Details", fontWeight = FontWeight.Bold) },
@@ -89,25 +90,49 @@ fun PatientDetailsScreen(
                 )
             }
         ) { innerPadding ->
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(
-                    top = innerPadding.calculateTopPadding() + 8.dp,
-                    bottom = 160.dp
-                )
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = innerPadding.calculateTopPadding()),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                items(
-                    state.items
-                ) { vital ->
-                    Box(modifier = Modifier.animateItem()) {
-                        VitalSignsItem(
-                            bloodPressure = vital.bloodPressure,
-                            bloodSugar = vital.bloodSugar,
-                            heartRate = vital.heartBeats
-                        )
+                SingleChoiceSegmentedButtonRow(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                ) {
+                    PatientDetailsTabEnum.entries.forEachIndexed { index, tab ->
+                        SegmentedButton(
+                            shape = SegmentedButtonDefaults.itemShape(
+                                index = index,
+                                count = PatientDetailsTabEnum.entries.size
+                            ),
+                            onClick = { viewModel.onTabSelected(tab) },
+                            selected = state.selectedTab == tab,
+                            icon = {}
+                        ) {
+                            Text(tab.title)
+                        }
+                    }
+                }
+                Crossfade(
+                    targetState = state.selectedTab,
+                    modifier = Modifier.fillMaxSize(),
+                    animationSpec = tween(300)
+                ) { tab ->
+                    when (tab) {
+                        PatientDetailsTabEnum.Vitals -> VitalsPage(state)
+                        PatientDetailsTabEnum.Notes -> NotesPage("Test notes")
                     }
                 }
             }
+        }
+
+        if (state.isDialogOpen) {
+            Surface(
+                color = Color.Black.copy(alpha = overlayAlpha),
+                modifier = Modifier.fillMaxSize().clickable(enabled = false) {}
+            ) {}
         }
 
         if (state.isLoading) {
@@ -118,25 +143,40 @@ fun PatientDetailsScreen(
             )
         }
 
-        if (state.isDialogOpen) {
-            Surface(
-                color = Color.Black.copy(alpha = overlayAlpha),
-                modifier = Modifier.fillMaxSize().clickable(enabled = false) {}
-            ) {}
-        }
-
-        RecordingUISection(
-            state = state,
-            onRecordClick = {
-                voiceHandler.recordVoice { response ->
-                    if (response == "GRANTED") {
-                        viewModel.onRecordButtonClick()
+        if (state.selectedTab == PatientDetailsTabEnum.Vitals) {
+            RecordingUISection(
+                state = state,
+                onRecordClick = {
+                    voiceHandler.recordVoice { response ->
+                        if (response == "GRANTED") {
+                            viewModel.onRecordButtonClick()
+                        }
                     }
-                }
-            },
-            onCancelClick = { viewModel.onDismissRecording() },
-            onConfirmClick = { viewModel.onConfirmRecording() }
-        )
+                },
+                onCancelClick = { viewModel.onDismissRecording() },
+                onConfirmClick = { viewModel.onConfirmRecording() }
+            )
+        }
+    }
+}
+
+@Composable
+fun VitalsPage(
+    state: PatientDetailsScreenState,
+) {
+    Box(modifier = Modifier.fillMaxSize()) {
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(bottom = 160.dp)
+        ) {
+            items(state.items) { vital ->
+                VitalSignsItem(
+                    bloodPressure = vital.bloodPressure,
+                    bloodSugar = vital.bloodSugar,
+                    heartRate = vital.heartBeats
+                )
+            }
+        }
     }
 }
 
@@ -162,7 +202,6 @@ fun BoxScope.RecordingUISection(
                     .fillMaxWidth()
                     .heightIn(max = 200.dp),
                 shape = RoundedCornerShape(16.dp),
-//                color = MaterialTheme.colorScheme.secondaryContainer,
                 tonalElevation = 8.dp
             ) {
                 Box(modifier = Modifier.padding(16.dp).verticalScroll(rememberScrollState())) {
@@ -185,7 +224,6 @@ fun BoxScope.RecordingUISection(
                     modifier = Modifier.size(56.dp),
                     shape = CircleShape,
                     containerColor = MaterialTheme.colorScheme.errorContainer,
-//                    contentColor = MaterialTheme.colorScheme.onErrorContainer,
                     elevation = FloatingActionButtonDefaults.elevation(4.dp)
                 ) {
                     Icon(
@@ -221,7 +259,6 @@ fun BoxScope.RecordingUISection(
                     modifier = Modifier.size(56.dp),
                     shape = CircleShape,
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
-//                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
                     elevation = FloatingActionButtonDefaults.elevation(4.dp)
                 ) {
                     Icon(
@@ -232,5 +269,21 @@ fun BoxScope.RecordingUISection(
                 }
             }
         }
+    }
+}
+
+@Composable
+fun NotesPage(notesText: String) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(24.dp)
+    ) {
+        Text(
+            text = notesText,
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurface
+        )
     }
 }

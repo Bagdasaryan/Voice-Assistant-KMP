@@ -97,6 +97,10 @@ class PatientDetailsViewModel(
         }
     }
 
+    fun onTabSelected(tab: PatientDetailsTabEnum) {
+        _state.update { it.copy(selectedTab = tab) }
+    }
+
     private fun observePatientsFoo(patientId: String) {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
