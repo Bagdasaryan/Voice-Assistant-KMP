@@ -16,9 +16,16 @@ class PatientsViewModel(
     private val _state = MutableStateFlow(PatientsScreenState())
     val state = _state.asStateFlow()
 
+    private var allPatients: List<PatientStateItem> = emptyList()
+
     init {
         observePatientsFoo()
         syncDataFoo()
+    }
+
+    fun onSearchQueryChange(newQuery: String) {
+        _state.update { it.copy(searchQuery = newQuery) }
+        filterPatients(newQuery)
     }
 
     private fun observePatientsFoo() {
@@ -33,11 +40,12 @@ class PatientsViewModel(
                         )
                     }
 
-                    _state.update { it.copy(
-                        items = uiItems,
-                        isEmpty = uiItems.isEmpty(),
-                        isLoading = false
-                    ) }
+                    allPatients = uiItems
+                    filterPatients(_state.value.searchQuery)
+
+                    _state.update {
+                        it.copy(isLoading = false)
+                    }
                 }
         }
     }
@@ -51,11 +59,26 @@ class PatientsViewModel(
             try {
                 syncPatients()
             } catch (e: Exception) {
-                _state.update { it.copy(
-                    error = e.message,
-                    isLoading = false
-                ) }
+                _state.update {
+                    it.copy(
+                        error = e.message,
+                        isLoading = false
+                    )
+                }
             }
         }
+    }
+
+    private fun filterPatients(query: String) {
+        val filtered = if (query.isEmpty()) {
+            allPatients
+        } else {
+            allPatients.filter { it.title.contains(query, ignoreCase = true) }
+        }
+
+        _state.update { it.copy(
+            items = filtered,
+            isEmpty = filtered.isEmpty()
+        ) }
     }
 }
