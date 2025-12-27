@@ -36,7 +36,6 @@ fun AppNavHost() {
             arguments = listOf(navArgument("patientId") { type = NavType.StringType })
         ) { backStackEntry ->
             val patientId = backStackEntry.savedStateHandle.get<String>("patientId") ?: ""
-            println("Clicked on patient: $patientId")
 
             val viewModel: PatientDetailsViewModel = koinViewModel { parametersOf(patientId) }
             PatientDetailsScreen(

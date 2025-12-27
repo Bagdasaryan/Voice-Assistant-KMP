@@ -9,6 +9,7 @@ fun PatientDto.toDomain(): Patient =
     Patient(
         id = this.id,
         name = this.name,
+        notes = this.notes,
         vitals = this.vitals.map { vital ->
             vital.toDomain()
         }

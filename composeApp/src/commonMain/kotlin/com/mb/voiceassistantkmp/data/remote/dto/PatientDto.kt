@@ -24,6 +24,7 @@ data class ResponseBodyDto(
 data class PatientDto(
     val id: String,
     val name: String,
+    val notes: String,
     val vitals: List<VitalDto>
 )
 

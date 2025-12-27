@@ -9,7 +9,8 @@ import com.mb.voiceassistantkmp.domain.model.Vital
 
 fun Patient.toEntity() = PatientEntity(
     id = this.id,
-    name = this.name
+    name = this.name,
+    notes = this.notes
 )
 
 fun Vital.toEntity(id: String) = VitalEntity(
