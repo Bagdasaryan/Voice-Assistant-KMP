@@ -7,6 +7,7 @@ import com.mb.voiceassistantkmp.data.remote.dto.GetPatientsRequestDto
 import com.mb.voiceassistantkmp.data.remote.dto.ParseTextRequestDto
 import com.mb.voiceassistantkmp.data.remote.dto.PatientsResponseDto
 import com.mb.voiceassistantkmp.data.remote.dto.VitalDto
+import com.mb.voiceassistantkmp.data.remote.endpoint.Endpoints
 import com.mb.voiceassistantkmp.domain.model.Vital
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -16,28 +17,25 @@ import io.ktor.http.ContentType
 import io.ktor.http.contentType
 
 open class ApiService(
-    private val client: HttpClient
+    private val client: HttpClient,
+    private val endpoint: Endpoints
 ) {
-    // https://raw.githubusercontent.com/Bagdasaryan/mock_server/main/list_of_all_patients.js
-    // http://192.168.178.175:5000
-    // http://172.20.10.2:5000
-
     open suspend fun getPatients(lastUpdateTime: Long): PatientsResponseDto {
-        return client.post(urlString = "http://192.168.178.175:5000/patients") {
+        return client.post(urlString = "${endpoint.urlStr}/patients") {
             contentType(ContentType.Application.Json)
             setBody(GetPatientsRequestDto(lastUpdateTime = lastUpdateTime.toString()))
         }.body()
     }
 
-    suspend open fun analyzeText(text: String): VitalDto {
-        return client.post("http://192.168.178.175:5000/parse") {
+    open suspend fun analyzeText(text: String): VitalDto {
+        return client.post("${endpoint.urlStr}/parse") {
             contentType(ContentType.Application.Json)
             setBody(ParseTextRequestDto(text = text))
         }.body()
     }
 
-    suspend open fun sendNewVitalsToHost(patientId: String, vital: Vital): AddVitalToHostResponseDto {
-        return client.post("http://192.168.178.175:5000/patients/vital") {
+    open suspend fun sendNewVitalsToHost(patientId: String, vital: Vital): AddVitalToHostResponseDto {
+        return client.post("${endpoint.urlStr}/patients/vital") {
             contentType(ContentType.Application.Json)
             setBody(
                 AddVitalToHostRequestDto(

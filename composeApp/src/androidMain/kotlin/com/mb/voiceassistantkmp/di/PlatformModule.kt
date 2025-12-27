@@ -3,6 +3,7 @@ package com.mb.voiceassistantkmp.di
 import androidx.room.Room
 import com.mb.voiceassistantkmp.data.local.database.AppDatabase
 import com.mb.voiceassistantkmp.data.remote.api.ApiService
+import com.mb.voiceassistantkmp.data.remote.endpoint.Endpoints
 import com.mb.voiceassistantkmp.data.repository.PatientRepositoryImpl
 import com.mb.voiceassistantkmp.data.repository.SpeechRecognizerRepositoryImpl
 import com.mb.voiceassistantkmp.domain.repository.PatientRepository
@@ -35,7 +36,7 @@ fun platformModule() = module {
             }
         }
     }
-    single { ApiService(get()) }
+    single { ApiService(get(), Endpoints.LocalServer3) }
 
     single<PatientRepository> { PatientRepositoryImpl(get(), get(), get(), get()) }
     single<SpeechRecognizerRepository> { SpeechRecognizerRepositoryImpl(get(), get()) }
