@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mb.voiceassistantkmp.domain.model.Vital
 import com.mb.voiceassistantkmp.domain.usecase.AnalyzeTextUseCase
+import com.mb.voiceassistantkmp.domain.usecase.ObservePatientByIdUseCase
 import com.mb.voiceassistantkmp.domain.usecase.ObserveVitalsUseCase
 import com.mb.voiceassistantkmp.domain.usecase.SaveVitalUseCase
 import com.mb.voiceassistantkmp.domain.usecase.StartSpeechRecognitionUseCase
@@ -11,12 +12,15 @@ import com.mb.voiceassistantkmp.domain.usecase.StopSpeechRecognitionUseCase
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class PatientDetailsViewModel(
     private val patientId: String,
-    private val observePatients: ObserveVitalsUseCase,
+    private val observeVitals: ObserveVitalsUseCase,
+    private val observePatient: ObservePatientByIdUseCase,
     private val startSpeechRecognition: StartSpeechRecognitionUseCase,
     private val stopSpeechRecognition: StopSpeechRecognitionUseCase,
     private val analyzeTextUseCase: AnalyzeTextUseCase,
@@ -105,20 +109,27 @@ class PatientDetailsViewModel(
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
 
-            observePatients(patientId)
-                .collect { vitals ->
-                    val uiItems = vitals.map {
-                        DetailsStateItem(
-                            bloodPressure = it.bloodPressure,
-                            bloodSugar = it.bloodSugar,
-                            heartBeats = it.heartBeats
-                        )
-                    }
-                    _state.update { it.copy(
+            combine(
+                observePatient(patientId),
+                observeVitals(patientId)
+            ) { patient, vitals ->
+                val uiItems = vitals.map {
+                    DetailsStateItem(
+                        bloodPressure = it.bloodPressure,
+                        bloodSugar = it.bloodSugar,
+                        heartBeats = it.heartBeats
+                    )
+                }
+
+                _state.update {
+                    it.copy(
+                        patientName = patient.name,
+                        notes = patient.notes,
                         items = uiItems,
                         isLoading = false
-                    ) }
+                    )
                 }
+            }.collect()
         }
     }
 

@@ -10,6 +10,7 @@ import com.mb.voiceassistantkmp.domain.model.Vital
 fun PatientEntity.toDomain() = Patient(
     id = this.id,
     name = this.name,
+    notes = this.notes,
     vitals = emptyList()
 )
 

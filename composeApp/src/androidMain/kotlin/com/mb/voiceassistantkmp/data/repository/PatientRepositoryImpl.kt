@@ -46,6 +46,11 @@ class PatientRepositoryImpl(
             .map { it.map { e -> e.toDomain() } }
     }
 
+    override fun observePatientById(id: String): Flow<Patient> {
+        return patientDao.observePatientById(id)
+            .map { it.toDomain() }
+    }
+
     override fun observeVitalsByPatientId(id: String): Flow<List<Vital>> {
         return vitalDao.observeVitalsByPatientId(id)
             .map { entities ->

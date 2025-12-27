@@ -122,7 +122,7 @@ fun PatientDetailsScreen(
                 ) { tab ->
                     when (tab) {
                         PatientDetailsTabEnum.Vitals -> VitalsPage(state)
-                        PatientDetailsTabEnum.Notes -> NotesPage("Test notes")
+                        PatientDetailsTabEnum.Notes -> NotesPage(state.notes)
                     }
                 }
             }

@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.Flow
 interface PatientRepository {
     suspend fun syncPatients()
     fun observePatients(): Flow<List<Patient>>
+    fun observePatientById(id: String): Flow<Patient>
     fun observeVitalsByPatientId(id: String): Flow<List<Vital>>
     suspend fun saveVital(patientId: String, vital: Vital)
 }
