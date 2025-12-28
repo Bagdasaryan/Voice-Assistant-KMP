@@ -122,12 +122,28 @@ fun PatientDetailsScreen(
             },
             topBar = {
                 LargeTopAppBar(
-                    title = { Text("Patient Details", fontWeight = FontWeight.Bold) },
-                navigationIcon = {
-                    IconButton(onClick = onBackClick) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
-                    }
-                },
+                    title = {
+                        Column {
+                            Text(
+                                text = state.patientName.ifBlank { "Loading..." },
+                                fontWeight = FontWeight.Bold,
+                                style = MaterialTheme.typography.headlineMedium
+                            )
+
+                            if (state.patientName.isNotBlank()) {
+                                Text(
+                                    text = "Patient Records",
+                                    style = MaterialTheme.typography.labelMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
+                    },
+                    navigationIcon = {
+                        IconButton(onClick = onBackClick) {
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
+                        }
+                    },
                     scrollBehavior = scrollBehavior
                 )
             }
