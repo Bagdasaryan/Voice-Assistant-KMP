@@ -3,6 +3,7 @@ package com.mb.voiceassistantkmp.presentation.screen_patientDetails
 data class PatientDetailsScreenState(
     val isLoading: Boolean = false,
     val error: String? = null,
+    val snackBarEvent: SnackBarEvent? = null,
     val patientName: String = "",
     val notes: String = "",
     val items: List<DetailsStateItem> = emptyList(),

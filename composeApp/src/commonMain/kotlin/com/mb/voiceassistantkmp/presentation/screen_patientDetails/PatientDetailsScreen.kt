@@ -45,13 +45,18 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -74,17 +79,47 @@ fun PatientDetailsScreen(
     onBackClick: () -> Unit
 ) {
     val state by viewModel.state.collectAsState()
+    val snackBarHostState = remember { SnackbarHostState() }
 
     val overlayAlpha by animateFloatAsState(if (state.isDialogOpen) 0.6f else 0.0f)
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
 
     val voiceHandler = LocalVoiceHandler.current
 
+    LaunchedEffect(state.snackBarEvent) {
+        state.snackBarEvent?.let { event ->
+            snackBarHostState.showSnackbar(
+                message = event.message,
+                withDismissAction = true
+            )
+            viewModel.onSnackBarShown()
+        }
+    }
+
     Box(modifier = Modifier.fillMaxSize()) {
         Scaffold(
             modifier = Modifier
                 .fillMaxSize()
                 .nestedScroll(scrollBehavior.nestedScrollConnection),
+            snackbarHost = {
+                val isError = state.snackBarEvent?.type == SnackBarType.ERROR
+                val containerColor = if (isError) {
+                    MaterialTheme.colorScheme.error
+                } else {
+                    MaterialTheme.colorScheme.primary
+                }
+                SnackbarHost(
+                    snackBarHostState,
+                    modifier = Modifier.padding(bottom = 104.dp)
+                ) { data ->
+                    Snackbar(
+                        snackbarData = data,
+                        containerColor = containerColor,
+                        contentColor = Color.White,
+                        shape = RoundedCornerShape(8.dp)
+                    )
+                }
+            },
             topBar = {
                 LargeTopAppBar(
                     title = { Text("Patient Details", fontWeight = FontWeight.Bold) },

@@ -75,22 +75,31 @@ class PatientDetailsViewModel(
             _state.update { it.copy(isLoading = true) }
 
             try {
-                analyzeTextUseCase(_state.value.accumulatedText).apply {
+                val result = analyzeTextUseCase(_state.value.accumulatedText)
 
-                    saveVitalUseCase(patientId = patientId, vital = Vital(
-                        bloodPressure = bloodPressure,
-                        bloodSugar = bloodSugar,
-                        heartBeats = heartBeats,
-                        dateTimeInMillis = dateTimeInMillis
-                    ))
+                _state.update { it.copy(
+                    isLoading = false,
+                    isDialogOpen = false,
+                    showActionButtons = false
+                ) }
+                if (result.hasEmptyFields) {
                     _state.update { it.copy(
-                        isLoading = false,
-                        isDialogOpen = false,
-                        showActionButtons = false,
-                        accumulatedText = "",
-                        currentPartialText = ""
+                        snackBarEvent = SnackBarEvent(
+                            message = "Some data was not recognized. Please try again.",
+                            type = SnackBarType.ERROR
+                        )
+                    ) }
+                } else {
+                    saveVitalUseCase(patientId, result)
+                    _state.update { it.copy(
+                        snackBarEvent = SnackBarEvent(
+                            message = "Vitals saved successfully!",
+                            type = SnackBarType.SUCCESS
+                        )
                     ) }
                 }
+
+                _state.update { it.copy(accumulatedText = "", currentPartialText = "") }
             } catch (e: Exception) {
                 _state.update { it.copy(
                     isLoading = false,
@@ -104,6 +113,10 @@ class PatientDetailsViewModel(
 
     fun onTabSelected(tab: PatientDetailsTabEnum) {
         _state.update { it.copy(selectedTab = tab) }
+    }
+
+    fun onSnackBarShown() {
+        _state.update { it.copy(snackBarEvent = null) }
     }
 
     private fun observePatientsFoo(patientId: String) {

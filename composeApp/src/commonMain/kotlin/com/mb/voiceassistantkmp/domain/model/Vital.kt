@@ -5,4 +5,7 @@ data class Vital(
     val bloodSugar: String,
     val heartBeats: String,
     val dateTimeInMillis: Long
-)
+) {
+    val hasEmptyFields: Boolean
+        get() = bloodPressure.isBlank() || bloodSugar.isBlank() || heartBeats.isBlank()
+}
