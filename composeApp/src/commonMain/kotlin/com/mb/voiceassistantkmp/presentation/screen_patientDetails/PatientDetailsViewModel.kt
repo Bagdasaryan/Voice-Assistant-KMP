@@ -76,6 +76,7 @@ class PatientDetailsViewModel(
 
             try {
                 analyzeTextUseCase(_state.value.accumulatedText).apply {
+
                     saveVitalUseCase(patientId = patientId, vital = Vital(
                         bloodPressure = bloodPressure,
                         bloodSugar = bloodSugar,

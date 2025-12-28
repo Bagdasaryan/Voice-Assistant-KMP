@@ -39,6 +39,8 @@ kotlin {
             implementation(libs.androidx.room.runtime.android)
             implementation(compose.preview)
             implementation(libs.koin.android)
+            implementation(libs.androidx.core.splashscreen)
+            implementation(libs.material)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
