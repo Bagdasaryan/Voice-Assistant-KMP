@@ -27,6 +27,7 @@ koinViewModel = "4.0.0"
 navigationCompose = "2.9.1"
 constraintLayout = "2.2.2"
 turbine = "1.2.1"
+kotlinxDateTime = "0.7.1"
 
 [libraries]
 androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "coreSplashscreen" }
@@ -56,6 +57,7 @@ koin-compose-viewmodel = { module = "io.insert-koin:koin-compose-viewmodel", ver
 material = { module = "com.google.android.material:material", version.ref = "material" }
 navigation-compose = { module = "org.jetbrains.androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
+kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDateTime" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

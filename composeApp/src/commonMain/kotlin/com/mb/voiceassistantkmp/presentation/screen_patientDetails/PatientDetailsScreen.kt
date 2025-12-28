@@ -215,7 +215,8 @@ fun VitalsPage(
                 VitalSignsItem(
                     bloodPressure = vital.bloodPressure,
                     bloodSugar = vital.bloodSugar,
-                    heartRate = vital.heartBeats
+                    heartRate = vital.heartBeats,
+                    timestamp = vital.formattedTime
                 )
             }
         }

@@ -18,7 +18,8 @@ import androidx.compose.ui.unit.dp
 fun VitalSignsItem(
     bloodPressure: String,
     bloodSugar: String,
-    heartRate: String
+    heartRate: String,
+    timestamp: String
 ) {
     ElevatedCard(
         modifier = Modifier
@@ -30,9 +31,23 @@ fun VitalSignsItem(
             modifier = Modifier.padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            VitalSignRow(label = "Blood pressure", value = "${bloodPressure} mmHg")
-            VitalSignRow(label = "Blood sugar", value = "${bloodSugar} mg/dL")
-            VitalSignRow(label = "Heart rate", value = "${heartRate} bpm")
+            VitalSignRow(label = "Blood pressure", value = "$bloodPressure mmHg")
+            VitalSignRow(label = "Blood sugar", value = "$bloodSugar mg/dL")
+            VitalSignRow(label = "Heart rate", value = "$heartRate bpm")
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 4.dp),
+                horizontalArrangement = Arrangement.End
+            ) {
+                Text(
+                    text = timestamp,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                    fontWeight = FontWeight.Normal
+                )
+            }
         }
     }
 }

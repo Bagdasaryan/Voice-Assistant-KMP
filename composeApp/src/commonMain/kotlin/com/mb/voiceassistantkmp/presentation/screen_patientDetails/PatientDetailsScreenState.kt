@@ -29,5 +29,6 @@ data class PatientDetailsScreenState(
 data class DetailsStateItem(
     val bloodPressure: String,
     val bloodSugar: String,
-    val heartBeats: String
+    val heartBeats: String,
+    val formattedTime: String
 )

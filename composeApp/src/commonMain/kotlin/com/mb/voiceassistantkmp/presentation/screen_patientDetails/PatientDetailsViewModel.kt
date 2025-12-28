@@ -2,7 +2,6 @@ package com.mb.voiceassistantkmp.presentation.screen_patientDetails
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.mb.voiceassistantkmp.domain.model.Vital
 import com.mb.voiceassistantkmp.domain.usecase.AnalyzeTextUseCase
 import com.mb.voiceassistantkmp.domain.usecase.ObservePatientByIdUseCase
 import com.mb.voiceassistantkmp.domain.usecase.ObserveVitalsUseCase
@@ -16,6 +15,11 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.number
+import kotlinx.datetime.toLocalDateTime
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 class PatientDetailsViewModel(
     private val patientId: String,
@@ -119,6 +123,7 @@ class PatientDetailsViewModel(
         _state.update { it.copy(snackBarEvent = null) }
     }
 
+    @OptIn(ExperimentalTime::class)
     private fun observePatientsFoo(patientId: String) {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
@@ -128,10 +133,20 @@ class PatientDetailsViewModel(
                 observeVitals(patientId)
             ) { patient, vitals ->
                 val uiItems = vitals.map {
+                    val instant = Instant.fromEpochMilliseconds(it.dateTimeInMillis)
+                    val localDateTime = instant.toLocalDateTime(TimeZone.currentSystemDefault())
+                    val day = localDateTime.day.toString().padStart(2, '0')
+                    val month = localDateTime.month.number.toString().padStart(2, '0')
+                    val year = localDateTime.year
+                    val hour = localDateTime.hour.toString().padStart(2, '0')
+                    val minute = localDateTime.minute.toString().padStart(2, '0')
+                    val formattedTime = "$day.$month.$year $hour:$minute"
+
                     DetailsStateItem(
                         bloodPressure = it.bloodPressure,
                         bloodSugar = it.bloodSugar,
-                        heartBeats = it.heartBeats
+                        heartBeats = it.heartBeats,
+                        formattedTime = formattedTime
                     )
                 }
 
