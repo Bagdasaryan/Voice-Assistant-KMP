@@ -1,48 +1,52 @@
-This is a Kotlin Multiplatform project targeting Android, iOS, Desktop (JVM).
+# **Voice Assistant App**
 
-* [/composeApp](./composeApp/src) is for code that will be shared across your Compose Multiplatform applications.
-  It contains several subfolders:
-  - [commonMain](./composeApp/src/commonMain/kotlin) is for code that’s common for all targets.
-  - Other folders are for Kotlin code that will be compiled for only the platform indicated in the folder name.
-    For example, if you want to use Apple’s CoreCrypto for the iOS part of your Kotlin app,
-    the [iosMain](./composeApp/src/iosMain/kotlin) folder would be the right place for such calls.
-    Similarly, if you want to edit the Desktop (JVM) specific part, the [jvmMain](./composeApp/src/jvmMain/kotlin)
-    folder is the appropriate location.
+Voice Assistant is a KMP application that allows medical staff to add a patient's medical readings using voice input.
 
-* [/iosApp](./iosApp/iosApp) contains iOS applications. Even if you’re sharing your UI with Compose Multiplatform,
-  you need this entry point for your iOS app. This is also where you should add SwiftUI code for your project.
+# Features
+On the `main screen`, a list of patients is displayed, retrieved from the server.
 
-### Build and Run Android Application
+For quick finding of a specific patient, a `dynamic search bar` is supported.
 
-To build and run the development version of the Android app, use the run configuration from the run widget
-in your IDE’s toolbar or build it directly from the terminal:
-- on macOS/Linux
-  ```shell
-  ./gradlew :composeApp:assembleDebug
-  ```
-- on Windows
-  ```shell
-  .\gradlew.bat :composeApp:assembleDebug
-  ```
+Tapping on a specific patient takes the user to the `patient details screen`.
+Here, the patient's history of vitals is displayed.
+Tapping the `voice input button` allows dictating the vitals of the patient and adding them to the history.
 
-### Build and Run Desktop (JVM) Application
+On the `patient details screen`, the patient's history of illness is also displayed, in the **_Notes_** section.
 
-To build and run the development version of the desktop app, use the run configuration from the run widget
-in your IDE’s toolbar or run it directly from the terminal:
-- on macOS/Linux
-  ```shell
-  ./gradlew :composeApp:run
-  ```
-- on Windows
-  ```shell
-  .\gradlew.bat :composeApp:run
-  ```
 
-### Build and Run iOS Application
+# Screenshots
+<img src="screenshots/splash_light.png" width="180"/> <img src="screenshots/splash_night.png" width="180"/>
+<img src="screenshots/main_light.png" width="180"/> <img src="screenshots/main_night.png" width="180"/>
+<img src="screenshots/main_search_light.png" width="180"/> <img src="screenshots/main_search_night.png" width="180"/>
 
-To build and run the development version of the iOS app, use the run configuration from the run widget
-in your IDE’s toolbar or open the [/iosApp](./iosApp) directory in Xcode and run it from there.
+<img src="screenshots/details_vitals_light.png" width="180"/> <img src="screenshots/details_vitals_night.png" width="180"/>
+<img src="screenshots/details_recognizer_light.png" width="180"/> <img src="screenshots/details_recognizer_night.png" width="180"/>
+<img src="screenshots/details_notes_light.png" width="180"/> <img src="screenshots/details_notes_night.png" width="180"/>
 
----
+# Tech Stack
+- **Kotlin Multiplatform**
 
-Learn more about [Kotlin Multiplatform](https://www.jetbrains.com/help/kotlin-multiplatform-dev/get-started.html)…
+- **MVVM**
+
+- **Clean Architecture**
+
+- **Jetpack Compose**
+
+- **Coroutines**
+
+- **Ktor** for client-server interaction
+
+- **Dependency Injection** (Koin)
+
+- **Room DB**
+
+- **JUnit tests**
+
+
+
+
+
+
+
+
+

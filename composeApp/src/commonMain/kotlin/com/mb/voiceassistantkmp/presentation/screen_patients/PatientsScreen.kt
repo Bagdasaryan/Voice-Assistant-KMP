@@ -64,7 +64,7 @@ fun PatientsScreen(
                     LargeTopAppBar(
                         title = {
                             Text(
-                                text = "Patients list",
+                                text = "Patient list",
                                 style = MaterialTheme.typography.headlineLarge,
                                 fontWeight = FontWeight.Bold
                             )
