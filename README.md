@@ -17,9 +17,10 @@ On the `patient details screen`, the patient's history of illness is also displa
 # Screenshots
 <img src="screenshots/splash_light.png" width="180"/> <img src="screenshots/splash_night.png" width="180"/>
 <img src="screenshots/main_light.png" width="180"/> <img src="screenshots/main_night.png" width="180"/>
-<img src="screenshots/main_search_light.png" width="180"/> <img src="screenshots/main_search_night.png" width="180"/>
 
+<img src="screenshots/main_search_light.png" width="180"/> <img src="screenshots/main_search_night.png" width="180"/>
 <img src="screenshots/details_vitals_light.png" width="180"/> <img src="screenshots/details_vitals_night.png" width="180"/>
+
 <img src="screenshots/details_recognizer_light.png" width="180"/> <img src="screenshots/details_recognizer_night.png" width="180"/>
 <img src="screenshots/details_notes_light.png" width="180"/> <img src="screenshots/details_notes_night.png" width="180"/>
 
