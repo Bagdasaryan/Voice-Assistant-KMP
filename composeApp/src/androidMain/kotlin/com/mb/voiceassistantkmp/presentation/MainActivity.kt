@@ -1,4 +1,4 @@
-package com.mb.voiceassistantkmp
+package com.mb.voiceassistantkmp.presentation
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -9,8 +9,8 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.mb.voiceassistantkmp.presentation.navigation.AppNavHost
-import com.mb.voiceassistantkmp.presentation.utils.LocalVoiceHandler
 import com.mb.voiceassistantkmp.presentation.utils.AndroidVoiceHandler
+import com.mb.voiceassistantkmp.presentation.utils.LocalVoiceHandler
 import com.mb.voiceassistantkmp.ui.theme.AppTheme
 
 class MainActivity : ComponentActivity() {
