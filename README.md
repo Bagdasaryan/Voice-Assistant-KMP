@@ -43,8 +43,8 @@ On the `patient details screen`, the patient's history of illness is also displa
 
 - **JUnit tests**
 
-
-
+# App Architecture
+<img src="screenshots/App%20Architecture.png"/>
 
 
 
