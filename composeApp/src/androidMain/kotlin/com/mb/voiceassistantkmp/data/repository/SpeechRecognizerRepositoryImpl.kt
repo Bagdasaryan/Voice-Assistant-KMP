@@ -65,7 +65,7 @@ class SpeechRecognizerRepositoryImpl(
                         SpeechRecognizer.ERROR_INSUFFICIENT_PERMISSIONS -> AppError.Speech.PermissionDenied
                         else -> AppError.Unknown("Something went wrong")
                     }
-                    close(Exception("Speech error: ${error}"))
+                    close(Exception("Speech error: $appError"))
                 }
 
                 override fun onReadyForSpeech(params: Bundle?) {}
