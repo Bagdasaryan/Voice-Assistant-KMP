@@ -2,6 +2,8 @@ package com.mb.voiceassistantkmp.presentation.screen_patients
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.mb.voiceassistantkmp.data.mapper.mapErrorToMessage
+import com.mb.voiceassistantkmp.domain.error.Resource
 import com.mb.voiceassistantkmp.domain.usecase.ObservePatientsUseCase
 import com.mb.voiceassistantkmp.domain.usecase.SyncPatientsUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -56,14 +58,15 @@ class PatientsViewModel(
                 _state.update { it.copy(isLoading = true) }
             }
 
-            try {
-                syncPatients()
-            } catch (e: Exception) {
-                _state.update {
-                    it.copy(
-                        error = e.message,
-                        isLoading = false
-                    )
+            when (val syncResult = syncPatients()) {
+                is Resource.Success -> { _state.update { it.copy(isLoading = false) } }
+                is Resource.Error -> {
+                    _state.update {
+                        it.copy(
+                            error = mapErrorToMessage(syncResult.error),
+                            isLoading = false
+                        )
+                    }
                 }
             }
         }

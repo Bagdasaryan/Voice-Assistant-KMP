@@ -9,7 +9,10 @@ import android.speech.RecognitionListener
 import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
 import com.mb.voiceassistantkmp.data.mapper.toDomain
+import com.mb.voiceassistantkmp.data.mapper.toError
 import com.mb.voiceassistantkmp.data.remote.api.ApiService
+import com.mb.voiceassistantkmp.domain.error.AppError
+import com.mb.voiceassistantkmp.domain.error.Resource
 import com.mb.voiceassistantkmp.domain.model.Vital
 import com.mb.voiceassistantkmp.domain.repository.SpeechRecognizerRepository
 import kotlinx.coroutines.channels.awaitClose
@@ -23,8 +26,13 @@ class SpeechRecognizerRepositoryImpl(
 ) : SpeechRecognizerRepository {
     private var speechRecognizer: SpeechRecognizer? = null
 
-    override suspend fun analyzeText(text: String): Vital {
-        return api.analyzeText(text).toDomain()
+    override suspend fun analyzeText(text: String): Resource<Vital> {
+        return try {
+            val analyzedText = api.analyzeText(text).toDomain()
+            Resource.Success(analyzedText)
+        } catch (e: Exception) {
+            Resource.Error(e.toError())
+        }
     }
 
     override fun startListening(): Flow<String> {
@@ -52,10 +60,12 @@ class SpeechRecognizerRepositoryImpl(
                 }
 
                 override fun onError(error: Int) {
-                    if (error == SpeechRecognizer.ERROR_SPEECH_TIMEOUT)
-                        close()
-                    else if (error != SpeechRecognizer.ERROR_NO_MATCH)
-                        close(Exception("Speech error: ${error}"))
+                    val appError = when (error) {
+                        SpeechRecognizer.ERROR_SPEECH_TIMEOUT -> AppError.Speech.Timeout
+                        SpeechRecognizer.ERROR_INSUFFICIENT_PERMISSIONS -> AppError.Speech.PermissionDenied
+                        else -> AppError.Unknown("Something went wrong")
+                    }
+                    close(Exception("Speech error: ${error}"))
                 }
 
                 override fun onReadyForSpeech(params: Bundle?) {}

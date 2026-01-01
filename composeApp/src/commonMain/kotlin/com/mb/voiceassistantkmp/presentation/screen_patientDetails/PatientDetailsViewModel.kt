@@ -2,6 +2,8 @@ package com.mb.voiceassistantkmp.presentation.screen_patientDetails
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.mb.voiceassistantkmp.data.mapper.mapErrorToMessage
+import com.mb.voiceassistantkmp.domain.error.Resource
 import com.mb.voiceassistantkmp.domain.usecase.AnalyzeTextUseCase
 import com.mb.voiceassistantkmp.domain.usecase.ObservePatientByIdUseCase
 import com.mb.voiceassistantkmp.domain.usecase.ObserveVitalsUseCase
@@ -78,39 +80,38 @@ class PatientDetailsViewModel(
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
 
-            try {
-                val result = analyzeTextUseCase(_state.value.accumulatedText)
-
-                _state.update { it.copy(
-                    isLoading = false,
-                    isDialogOpen = false,
-                    showActionButtons = false
-                ) }
-                if (result.hasEmptyFields) {
+            when (val result = analyzeTextUseCase(_state.value.accumulatedText)) {
+                is Resource.Success -> {
                     _state.update { it.copy(
-                        snackBarEvent = SnackBarEvent(
-                            message = "Some data was not recognized. Please try again.",
-                            type = SnackBarType.ERROR
-                        )
+                        isLoading = false,
+                        isDialogOpen = false,
+                        showActionButtons = false
                     ) }
-                } else {
-                    saveVitalUseCase(patientId, result)
+                    if (result.data.hasEmptyFields) {
+                        _state.update { it.copy(
+                            snackBarEvent = SnackBarEvent(
+                                message = "Some data was not recognized. Please try again.",
+                                type = SnackBarType.ERROR
+                            )
+                        ) }
+                    } else {
+                        saveVitalUseCase(patientId, result.data)
+                        _state.update { it.copy(
+                            snackBarEvent = SnackBarEvent(
+                                message = "Vitals saved successfully!",
+                                type = SnackBarType.SUCCESS
+                            )
+                        ) }
+                    }
+                }
+                is Resource.Error -> {
                     _state.update { it.copy(
-                        snackBarEvent = SnackBarEvent(
-                            message = "Vitals saved successfully!",
-                            type = SnackBarType.SUCCESS
-                        )
+                        isLoading = false,
+                        isDialogOpen = false,
+                        showActionButtons = false,
+                        error = mapErrorToMessage(result.error)
                     ) }
                 }
-
-                _state.update { it.copy(accumulatedText = "", currentPartialText = "") }
-            } catch (e: Exception) {
-                _state.update { it.copy(
-                    isLoading = false,
-                    isDialogOpen = false,
-                    showActionButtons = false,
-                    error = e.message
-                ) }
             }
         }
     }

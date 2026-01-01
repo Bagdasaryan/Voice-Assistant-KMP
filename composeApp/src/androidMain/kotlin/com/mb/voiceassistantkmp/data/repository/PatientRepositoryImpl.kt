@@ -6,7 +6,9 @@ import com.mb.voiceassistantkmp.data.local.dao.VitalDao
 import com.mb.voiceassistantkmp.data.local.mapper.toDomain
 import com.mb.voiceassistantkmp.data.local.mapper.toEntity
 import com.mb.voiceassistantkmp.data.mapper.toDomain
+import com.mb.voiceassistantkmp.data.mapper.toError
 import com.mb.voiceassistantkmp.data.remote.api.ApiService
+import com.mb.voiceassistantkmp.domain.error.Resource
 import com.mb.voiceassistantkmp.domain.model.ActualData
 import com.mb.voiceassistantkmp.domain.model.Patient
 import com.mb.voiceassistantkmp.domain.model.Vital
@@ -21,24 +23,30 @@ class PatientRepositoryImpl(
     private val vitalDao: VitalDao,
     private val actualDataDao: ActualDataDao
 ) : PatientRepository {
-    override suspend fun syncPatients() {
-        val lastUpdate = actualDataDao.getActualVersionByTableName("patients").firstOrNull() ?: 0L
-        val respBody = api.getPatients(lastUpdate)
-        val patients = respBody.data.responseBody.patients
-            .map { it.toDomain() }
+    override suspend fun syncPatients(): Resource<Unit> {
+        return try {
+            val lastUpdate = actualDataDao.getActualVersionByTableName("patients").firstOrNull() ?: 0L
+            val respBody = api.getPatients(lastUpdate)
+            val patients = respBody.data.responseBody.patients
+                .map { it.toDomain() }
 
-        patientDao.insertPatients(patients.map { it.toEntity() })
-        vitalDao.insertVitals(
-            patients.flatMap { p->
-                p.vitals.map { it.toEntity(p.id) }
-            }
-        )
-        actualDataDao.insertActualVersion(
-            ActualData(
-                tableName = "patients",
-                lastUpdateTime = respBody.serverTimeInMillis.toLong()
-            ).toEntity()
-        )
+            patientDao.insertPatients(patients.map { it.toEntity() })
+            vitalDao.insertVitals(
+                patients.flatMap { p->
+                    p.vitals.map { it.toEntity(p.id) }
+                }
+            )
+            actualDataDao.insertActualVersion(
+                ActualData(
+                    tableName = "patients",
+                    lastUpdateTime = respBody.serverTimeInMillis.toLong()
+                ).toEntity()
+            )
+
+            Resource.Success(Unit)
+        } catch (e: Exception) {
+            Resource.Error(e.toError())
+        }
     }
 
     override fun observePatients(): Flow<List<Patient>> {
@@ -63,24 +71,22 @@ class PatientRepositoryImpl(
     override suspend fun saveVital(
         patientId: String,
         vital: Vital
-    ) {
-        try {
+    ): Resource<Unit> {
+        return try {
             val responseBody = api.sendNewVitalsToHost(patientId, vital)
+            val serverTime = responseBody.serverTimeInMillis.toLongOrNull() ?: System.currentTimeMillis()
 
-            if (responseBody.success) {
-                val serverTime = responseBody.serverTimeInMillis.toLongOrNull() ?: System.currentTimeMillis()
-                vitalDao.insertVital(vital.toEntity(patientId))
-                actualDataDao.insertActualVersion(
-                    ActualData(
-                        "patients",
-                        serverTime
-                    ).toEntity()
-                )
-            } else {
-                throw Exception("Server failed to process vitals")
-            }
+            vitalDao.insertVital(vital.toEntity(patientId))
+            actualDataDao.insertActualVersion(
+                ActualData(
+                    "patients",
+                    serverTime
+                ).toEntity()
+            )
+
+            Resource.Success(Unit)
         } catch (e: Exception) {
-            throw e
+            Resource.Error(e.toError())
         }
     }
 }
