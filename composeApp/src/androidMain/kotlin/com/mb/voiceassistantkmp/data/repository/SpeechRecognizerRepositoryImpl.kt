@@ -18,6 +18,7 @@ import com.mb.voiceassistantkmp.domain.repository.SpeechRecognizerRepository
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import timber.log.Timber
 import java.util.Locale
 
 class SpeechRecognizerRepositoryImpl(
@@ -65,6 +66,8 @@ class SpeechRecognizerRepositoryImpl(
                         SpeechRecognizer.ERROR_INSUFFICIENT_PERMISSIONS -> AppError.Speech.PermissionDenied
                         else -> AppError.Unknown("Something went wrong")
                     }
+
+                    Timber.e("Speech error: $appError")
                     close(Exception("Speech error: $appError"))
                 }
 

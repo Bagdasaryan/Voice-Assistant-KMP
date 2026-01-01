@@ -16,6 +16,7 @@ import com.mb.voiceassistantkmp.domain.repository.PatientRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
+import timber.log.Timber
 
 class PatientRepositoryImpl(
     private val api: ApiService,
@@ -43,6 +44,7 @@ class PatientRepositoryImpl(
                 ).toEntity()
             )
 
+            Timber.e("Failed to sync patients from server")
             Resource.Success(Unit)
         } catch (e: Exception) {
             Resource.Error(e.toError())
@@ -84,6 +86,7 @@ class PatientRepositoryImpl(
                 ).toEntity()
             )
 
+            Timber.e("Failed to vitals to server")
             Resource.Success(Unit)
         } catch (e: Exception) {
             Resource.Error(e.toError())

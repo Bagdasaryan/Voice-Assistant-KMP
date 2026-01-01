@@ -41,6 +41,7 @@ kotlin {
             implementation(libs.koin.android)
             implementation(libs.androidx.core.splashscreen)
             implementation(libs.material)
+            implementation(libs.timber)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -79,6 +80,10 @@ kotlin {
 android {
     namespace = "com.mb.voiceassistantkmp"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
+
+    buildFeatures {
+        buildConfig = true
+    }
 
     defaultConfig {
         applicationId = "com.mb.voiceassistantkmp"

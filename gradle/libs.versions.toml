@@ -26,6 +26,7 @@ ksp = "2.0.21"
 koinViewModel = "4.0.0"
 navigationCompose = "2.9.1"
 constraintLayout = "2.2.2"
+timber = "5.0.1"
 turbine = "1.2.1"
 kotlinxDateTime = "0.7.1"
 
@@ -56,6 +57,7 @@ koin-android = { module = "io.insert-koin:koin-android", version.ref = "koinAndr
 koin-compose-viewmodel = { module = "io.insert-koin:koin-compose-viewmodel", version.ref = "koinViewModel" }
 material = { module = "com.google.android.material:material", version.ref = "material" }
 navigation-compose = { module = "org.jetbrains.androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
+timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
 turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDateTime" }
 
